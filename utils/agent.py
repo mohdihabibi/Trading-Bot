@@ -3,7 +3,7 @@ import random
 from collections import deque
 
 import numpy as np
-from utils.model import model
+from utils.model import model, load
 from keras.models import clone_model
 
 
@@ -11,9 +11,9 @@ from keras.models import clone_model
 class Agent:
     """ Stock Trading Bot """
 
-    def __init__(self):
+    def __init__(self, pretrained=False, model_name=None):
         # agent config
-        self.state_size = 10    	# normalized previous days
+        self.state_size = 5    	# normalized previous days
         self.cash_in_hand = 6000
         self.total_share = 20
         self.action_size = 3           		# [sit, buy, sell]
@@ -21,16 +21,27 @@ class Agent:
         self.memory = deque(maxlen=10000)
         self.first_iter = True
 
+        if pretrained:
+            self.model = load()
+        else:
+            self.model = model()
+
         self.gamma = 0.95 # affinity for long term reward
         self.epsilon = 1.0
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
         self.learning_rate = 0.001
-        self.model = model()
         self.n_iter = 1
         self.reset_every = 1000
         self.target_model = clone_model(self.model)
         self.target_model.set_weights(self.model.get_weights())
+
+
+
+    def reset(self):
+        self.cash_in_hand = 6000
+        self.total_share = 20
+        self.inventory = []
 
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
