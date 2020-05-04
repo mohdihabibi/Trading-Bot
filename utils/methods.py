@@ -28,6 +28,8 @@ def get_state(data, agent, t, window_size):
         block = data[t - window_size: t]
         block_mean = np.array(block).mean()
         res = [agent.total_share, agent.cash_in_hand, data[t], agent.total_share*data[t], block_mean]
+        for i in range(len(res)):
+            res[i] = sigmoid(res[i])
         return np.array([res])
     else:
         raise ValueError
@@ -53,15 +55,19 @@ def train_model(agent, episode, data, ep_count=100, batch_size=32, window_size=5
             # BUY
             if action == 1:
                 if agent.cash_in_hand < data[t]:
+                    print('bankrupt...')
                     agent.remember(state, action, float('-inf'), next_state, True)
-                    raise ValueError
+                    return (episode, ep_count, total_profit, np.mean(np.array(avg_loss)))
                 agent.cash_in_hand -= data[t]
                 agent.total_share += 1
                 agent.inventory.append(data[t])
 
             # SELL
-            elif action == 2 and len(agent.inventory) > 0:
-                bought_price = agent.inventory.pop(0)
+            elif action == 2 and agent.total_share > 0:
+                if len(agent.inventory) == 0:
+                    bought_price = data[0]
+                else:
+                    bought_price = agent.inventory.pop(0)
                 delta = data[t] - bought_price
                 reward = delta #max(delta, 0)
                 agent.cash_in_hand = agent.cash_in_hand + bought_price + delta
@@ -79,13 +85,9 @@ def train_model(agent, episode, data, ep_count=100, batch_size=32, window_size=5
                 avg_loss.append(loss)
 
             state = next_state
-        except IndexError:
-            print('here')
+        except (IndexError, ValueError):
             agent.remember(state, action, reward, next_state, True)
-            break
-
-    if episode % 10 == 0:
-        save(agent.model, episode)
+            return (episode, ep_count, total_profit, np.mean(np.array(avg_loss)))
 
     return (episode, ep_count, total_profit, np.mean(np.array(avg_loss)))
 
@@ -98,14 +100,19 @@ def evaluate_model(agent, data, window_size, debug=True):
     agent.reset()
     
     state = get_state(data, agent, 5, window_size)
-
+    print(data_length)
     for t in range(0, data_length, window_size):
+        print(agent.cash_in_hand)
         reward = 0
-        next_state = get_state(data, agent, t+window_size, window_size)
+        try:
+            next_state = get_state(data, agent, t+window_size, window_size)
+        except ValueError:
+            return total_profit, history
         
         # select an action
         # print("evaluate_model___state: {}".format(state))
         action = agent.act(state, is_eval=True)
+        print(action)
         # BUY
         if action == 1:
             if agent.cash_in_hand < data[t]:
@@ -115,12 +122,14 @@ def evaluate_model(agent, data, window_size, debug=True):
             agent.inventory.append(data[t])
 
             history.append((data[t], "BUY"))
-            if debug:
-                logging.debug("Buy at: {}".format(format_currency(data[t])))
+            logging.debug("Buy at: {}".format(format_currency(data[t])))
         
         # SELL
-        elif action == 2 and len(agent.inventory) > 0:
-            bought_price = agent.inventory.pop(0)
+        elif action == 2 and agent.total_share > 0:
+            if len(agent.inventory) > 0:
+                bought_price = agent.inventory.pop(0)
+            else:
+                bought_price = data[0]
             delta = data[t] - bought_price
             reward = delta #max(delta, 0)
             agent.cash_in_hand = agent.cash_in_hand + bought_price + delta
@@ -128,16 +137,12 @@ def evaluate_model(agent, data, window_size, debug=True):
             total_profit += delta
 
             history.append((data[t], "SELL"))
-            if debug:
-                logging.debug("Sell at: {} | Position: {}".format(
-                    format_currency(data[t]), format_position(data[t] - bought_price)))
+            logging.debug("Sell at: {} | Position: {}".format(
+                format_currency(data[t]), format_position(data[t] - bought_price)))
         # HOLD
         else:
             history.append((data[t], "HOLD"))
 
-        done = (t == data_length)
-        agent.memory.append((state, action, reward, next_state, done))
+        agent.memory.append((state, action, reward, next_state, False))
 
         state = next_state
-        if done:
-            return total_profit, history

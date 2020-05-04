@@ -27,4 +27,4 @@ def save(model, episode):
 
 def load():
     custom_objects = {"huber_loss": huber_loss}
-    return load_model("models/" + "DDQN_50", custom_objects=custom_objects)
+    return load_model("models/" + "DDQN_1000", custom_objects=custom_objects)
