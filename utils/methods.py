@@ -56,8 +56,10 @@ def train_model(agent, episode, data, ep_count=100, batch_size=32, window_size=5
             if action == 1:
                 if agent.cash_in_hand < data[t]:
                     print('bankrupt...')
-                    agent.remember(state, action, float('-inf'), next_state, True)
+                    agent.remember(state, action, 0, next_state, True)
                     return (episode, ep_count, total_profit, np.mean(np.array(avg_loss)))
+                if len(agent.inventory) > 0:
+                    reward = 1 if data[t] < agent.inventory[-1] else 0
                 agent.cash_in_hand -= data[t]
                 agent.total_share += 1
                 agent.inventory.append(data[t])
@@ -69,7 +71,7 @@ def train_model(agent, episode, data, ep_count=100, batch_size=32, window_size=5
                 else:
                     bought_price = agent.inventory.pop(0)
                 delta = data[t] - bought_price
-                reward = delta #max(delta, 0)
+                reward = 1 if delta > 0 else 0
                 agent.cash_in_hand = agent.cash_in_hand + bought_price + delta
                 agent.total_share -= 1
                 total_profit += delta
@@ -102,8 +104,6 @@ def evaluate_model(agent, data, window_size, debug=True):
     state = get_state(data, agent, 5, window_size)
     print(data_length)
     for t in range(0, data_length, window_size):
-        print(agent.cash_in_hand)
-        reward = 0
         try:
             next_state = get_state(data, agent, t+window_size, window_size)
         except ValueError:
@@ -112,7 +112,6 @@ def evaluate_model(agent, data, window_size, debug=True):
         # select an action
         # print("evaluate_model___state: {}".format(state))
         action = agent.act(state, is_eval=True)
-        print(action)
         # BUY
         if action == 1:
             if agent.cash_in_hand < data[t]:
@@ -131,7 +130,6 @@ def evaluate_model(agent, data, window_size, debug=True):
             else:
                 bought_price = data[0]
             delta = data[t] - bought_price
-            reward = delta #max(delta, 0)
             agent.cash_in_hand = agent.cash_in_hand + bought_price + delta
             agent.total_share -= 1
             total_profit += delta
@@ -143,6 +141,5 @@ def evaluate_model(agent, data, window_size, debug=True):
         else:
             history.append((data[t], "HOLD"))
 
-        agent.memory.append((state, action, reward, next_state, False))
-
         state = next_state
+        print("cash_in_hand: {}, total_profit: {}, total_share: {}".format(agent.cash_in_hand, total_profit, agent.total_share))
