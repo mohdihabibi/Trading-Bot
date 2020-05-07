@@ -8,7 +8,11 @@ import math
 from utils.model import save
 
 # Formats Position
-format_position = lambda price: ('-$' if price < 0 else '+$') + '{0:.2f}'.format(abs(price))
+
+
+def format_position(price): return (
+    '-$' if price < 0 else '+$') + '{0:.2f}'.format(abs(price))
+
 
 def sigmoid(x):
     """Performs sigmoid operation
@@ -20,14 +24,17 @@ def sigmoid(x):
     except Exception as err:
         print("Error in sigmoid: " + err)
 
+
 # Formats Currency
-format_currency = lambda price: '${0:.2f}'.format(abs(price))
+def format_currency(price): return '${0:.2f}'.format(abs(price))
+
 
 def get_state(data, agent, t, window_size):
     if t < len(data)-1:
         block = data[t - window_size: t]
         block_mean = np.array(block).mean()
-        res = [agent.total_share, agent.cash_in_hand, data[t], agent.total_share*data[t], block_mean]
+        res = [agent.total_share, agent.cash_in_hand,
+               data[t], agent.total_share*data[t], block_mean]
         for i in range(len(res)):
             res[i] = sigmoid(res[i])
         return np.array([res])
@@ -100,15 +107,14 @@ def evaluate_model(agent, data, window_size, debug=True):
 
     history = []
     agent.reset()
-    
+
     state = get_state(data, agent, 5, window_size)
-    print(data_length)
     for t in range(0, data_length, window_size):
         try:
             next_state = get_state(data, agent, t+window_size, window_size)
         except ValueError:
-            return total_profit, history
-        
+            return total_profit, agent.cash_in_hand, agent.total_share
+
         # select an action
         # print("evaluate_model___state: {}".format(state))
         action = agent.act(state, is_eval=True)
@@ -121,8 +127,8 @@ def evaluate_model(agent, data, window_size, debug=True):
             agent.inventory.append(data[t])
 
             history.append((data[t], "BUY"))
-            logging.debug("Buy at: {}".format(format_currency(data[t])))
-        
+            print("Buy at: {}".format(format_currency(data[t])))
+
         # SELL
         elif action == 2 and agent.total_share > 0:
             if len(agent.inventory) > 0:
@@ -135,11 +141,13 @@ def evaluate_model(agent, data, window_size, debug=True):
             total_profit += delta
 
             history.append((data[t], "SELL"))
-            logging.debug("Sell at: {} | Position: {}".format(
+            print("Sell at: {} | Position: {}".format(
                 format_currency(data[t]), format_position(data[t] - bought_price)))
         # HOLD
         else:
             history.append((data[t], "HOLD"))
 
         state = next_state
-        print("cash_in_hand: {}, total_profit: {}, total_share: {}".format(agent.cash_in_hand, total_profit, agent.total_share))
+        print("cash_in_hand: {}, total_profit: {}, total_share: {}".format(
+            agent.cash_in_hand, total_profit, agent.total_share))
+    return total_profit, agent.cash_in_hand, agent.total_share
