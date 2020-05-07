@@ -11,7 +11,7 @@ from keras.models import clone_model
 class Agent:
     """ Stock Trading Bot """
 
-    def __init__(self, pretrained=False, model_name=None):
+    def __init__(self, current_price, pretrained=False):
         # agent config
         self.state_size = 5    	# normalized previous days
         self.cash_in_hand = 6000
@@ -20,12 +20,13 @@ class Agent:
         self.inventory = []
         self.memory = deque(maxlen=10000)
         self.first_iter = True
-
+        self.initial_price = current_price
         if pretrained:
             self.model = load()
         else:
             self.model = model()
-
+        for i in range(20):
+            self.inventory.append(self.initial_price)
         self.gamma = 0.95 # affinity for long term reward
         self.epsilon = 1.0
         self.epsilon_min = 0.01
@@ -42,6 +43,8 @@ class Agent:
         self.cash_in_hand = 6000
         self.total_share = 20
         self.inventory = []
+        for i in range(20):
+            self.inventory.append(self.initial_price)
 
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))

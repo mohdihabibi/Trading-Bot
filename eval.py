@@ -9,16 +9,16 @@ def format_position(price):
 
 def show_eval_result(model_name, profit, initial_offset):
     if profit == initial_offset or profit == 0.0:
-        logging.info('{}: USELESS\n'.format(model_name))
+        print('{}: USELESS\n'.format(model_name))
     else:
-        logging.info('{}: {}\n'.format(model_name, format_position(profit)))
+        print('{}: {}\n'.format(model_name, format_position(profit)))
 
 def main():
     df = pd.read_csv("data/GOOG_2019.csv")
     data = list(df['Open'])
     initial_offset = data[1] - data[0]
     window_size = 5
-    agent = Agent(pretrained=True)
+    agent = Agent(pretrained=True, current_price=data[0])
     profit, _ = evaluate_model(agent, data, window_size)
     show_eval_result("DDQN_1000", profit, initial_offset)
 
