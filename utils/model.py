@@ -14,7 +14,7 @@ def huber_loss(y_true, y_pred, clip_delta=1.0):
 
 def model():
     model = Sequential()
-    model.add(Dense(units=128, activation="relu", input_dim=5))
+    model.add(Dense(units=128, activation="relu", input_dim=8))
     model.add(Dense(units=256, activation="relu"))
     model.add(Dense(units=256, activation="relu"))
     model.add(Dense(units=128, activation="relu"))
