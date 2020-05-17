@@ -20,7 +20,7 @@ Our goal for this project is to implement a stock trading bot which is capable o
 
 
 #### Actor-Critic Test Results
-![](https://github.com/mohdihabibi/Trading-Bot/blob/master/Actor-Critic/Test_results-AC.png)
+![](https://github.com/mohdihabibi/Trading-Bot/blob/master/Actor-Critic/Test_results-AC.jpg)
 
 #### DQN Test Results
 ![](https://github.com/mohdihabibi/Trading-Bot/blob/master/DQN/plots/DQN_Test_Sell_vs_Buy.png)
