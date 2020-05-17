@@ -15,8 +15,8 @@ Our goal for this project is to implement a stock trading bot which is capable o
     - python3 eval.py data/GOOG_2019.csv --window-size 5 --model-name model_dqn_1000 --debug
     
 #### Steps to run Actor critic model
-    - To test stock trading for single stock download [Trading_bot_AC.ipynb](Actor-Critic/Trading_bot_AC.ipynb) and [AC_model_1](Actor-Critic/AC_model_1) import packages by running the first cell and executed cells following the save model cell in the notebook file
-    - To test stock trading for two stocks download [/Trading_bot_AC_2_stocks.ipynb](Actor-Critic/Trading_bot_AC_2_stocks.ipynb) and [AC_model_2](Actor-Critic/AC_model_2) import packages by running the first cell and executed cells following the save model cell in the notebook file
+   - To test stock trading for single stock download [Trading_bot_AC.ipynb](Actor-Critic/Trading_bot_AC.ipynb) and [AC_model_1](Actor-Critic/AC_model_1) import packages by running the first cell and executed cells following the save model cell in the notebook file
+   - To test stock trading for two stocks download [/Trading_bot_AC_2_stocks.ipynb](Actor-Critic/Trading_bot_AC_2_stocks.ipynb) and [AC_model_2](Actor-Critic/AC_model_2) import packages by running the first cell and executed cells following the save model cell in the notebook file
 
 
 #### Actor-Critic Test Results
