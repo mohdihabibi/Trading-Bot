@@ -1,11 +1,10 @@
 import random
-
+from tensorboardX import SummaryWriter
 from collections import deque
 
 import numpy as np
 from utils.model import model, load
 from keras.models import clone_model
-
 
 
 class Agent:
@@ -21,13 +20,14 @@ class Agent:
         self.memory = deque(maxlen=10000)
         self.first_iter = True
         self.initial_price = current_price
+        self.writer = SummaryWriter()
         if pretrained:
             self.model = load()
         else:
             self.model = model()
         for i in range(20):
             self.inventory.append(self.initial_price)
-        self.gamma = 0.95 # affinity for long term reward
+        self.gamma = 0.95  # affinity for long term reward
         self.epsilon = 1.0
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
@@ -36,8 +36,6 @@ class Agent:
         self.reset_every = 1000
         self.target_model = clone_model(self.model)
         self.target_model.set_weights(self.model.get_weights())
-
-
 
     def reset(self):
         self.cash_in_hand = 6000
@@ -56,7 +54,7 @@ class Agent:
 
         if self.first_iter:
             self.first_iter = False
-            return 1 # make a definite buy on the first iter
+            return 1  # make a definite buy on the first iter
 
         action_probs = self.model.predict(state)
         return np.argmax(action_probs[0])
@@ -66,7 +64,7 @@ class Agent:
         """
         mini_batch = random.sample(self.memory, batch_size)
         X_train, y_train = [], []
-
+        self.n_iter += 1
         if self.n_iter % self.reset_every == 0:
             # reset target model weights
             self.target_model.set_weights(self.model.get_weights())
@@ -76,7 +74,9 @@ class Agent:
                 target = reward
             else:
                 # approximate double deep q-learning equation
-                target = reward + self.gamma * self.target_model.predict(next_state)[0][np.argmax(self.model.predict(next_state)[0])]
+                target = reward + self.gamma * \
+                    self.target_model.predict(next_state)[0][np.argmax(
+                        self.model.predict(next_state)[0])]
 
             # estimate q-values based on current state
             q_values = self.model.predict(state)
@@ -91,12 +91,10 @@ class Agent:
             np.array(X_train), np.array(y_train),
             epochs=1, verbose=0
         ).history["loss"][0]
-
+        self.writer.add_scalar('loss per iteration', loss, self.n_iter)
         # as the training goes on we want the agent to
         # make less random and more optimal decisions
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
         return loss
-
-
