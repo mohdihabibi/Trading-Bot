@@ -18,6 +18,10 @@ Our goal for this project is to implement a stock trading bot which is capable o
    - To test stock trading for single stock download [Trading_bot_AC.ipynb](Actor-Critic/Trading_bot_AC.ipynb) and [AC_model_1](Actor-Critic/AC_model_1) import packages by running the first cell and executed cells following the save model cell in the notebook file
    - To test stock trading for two stocks download [/Trading_bot_AC_2_stocks.ipynb](Actor-Critic/Trading_bot_AC_2_stocks.ipynb) and [AC_model_2](Actor-Critic/AC_model_2) import packages by running the first cell and executed cells following the save model cell in the notebook file
 
+#### Steps to run DDQN
+	- To train first cd to DDQN
+	- Run python train.py
+	- To test run python test.py
 
 #### Actor-Critic Test Results
 ![](Actor-Critic/Test_results-AC.JPG)
@@ -26,3 +30,4 @@ Our goal for this project is to implement a stock trading bot which is capable o
 ![](https://github.com/mohdihabibi/Trading-Bot/blob/master/DQN/plots/DQN_Test_Sell_vs_Buy.png)
 
 #### DDQN Test Results
+![](DDQN/plots/single_stock_test.png)
