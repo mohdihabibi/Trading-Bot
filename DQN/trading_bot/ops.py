@@ -37,5 +37,4 @@ def get_state(data, agent, t, window_size):
         #print('res',res)
         return np.array([res])
     else:
-        print('error in get_state')
         raise ValueError    

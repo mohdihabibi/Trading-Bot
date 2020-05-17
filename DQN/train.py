@@ -20,6 +20,9 @@ Options:
 """
 
 import logging
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 import coloredlogs
 
 from docopt import docopt
@@ -56,7 +59,9 @@ def main(train_stock, window_size, batch_size, ep_count,
         train_result = train_model(agent, episode, train_data, ep_count=ep_count,
                                    batch_size=batch_size, window_size=window_size)
         #val_result, _ = evaluate_model(agent, val_data, window_size, debug)
-        show_train_result(train_result)
+        if episode % 100 == 0:
+            agent.save(episode)
+        #show_train_result(train_result)
        
         total_profit.append(train_result[2])
         cash_in_hand.append(agent.cash_in_hand)

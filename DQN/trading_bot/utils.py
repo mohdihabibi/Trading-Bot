@@ -28,9 +28,9 @@ def show_eval_result(model_name, profit, initial_offset):
     """
     #print('profit',profit)
     if profit == initial_offset or profit == 0.0:
-        logging.info('{}: USELESS\n'.format(model_name))
+        print('{}: USELESS\n'.format(model_name))
     else:
-        logging.info('{}: {}\n'.format(model_name, format_position(profit)))
+        print('Total Profit: {}\n'.format(format_position(profit)))
 
 
 def get_stock_data(stock_file):
