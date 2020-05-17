@@ -101,9 +101,13 @@ def train_model(agent, episode, data, ep_count=100, batch_size=32, window_size=5
     return (episode, ep_count, total_profit, np.mean(np.array(avg_loss)))
 
 
-def evaluate_model(agent, data, window_size, debug=True):
+def evaluate_model(agent, data, data_date, window_size, debug=True):
     total_profit = 0
     data_length = len(data) - 1
+    google_buy = []
+    apple_buy = []
+    google_sell = []
+    apple_sell = []
 
     history = []
     agent.reset()
@@ -113,7 +117,7 @@ def evaluate_model(agent, data, window_size, debug=True):
         try:
             next_state = get_state(data, agent, t+window_size, window_size)
         except ValueError:
-            return total_profit, agent.cash_in_hand, agent.total_share
+            return total_profit, agent.cash_in_hand, agent.total_share, google_buy, google_sell
 
         # select an action
         # print("evaluate_model___state: {}".format(state))
@@ -122,6 +126,7 @@ def evaluate_model(agent, data, window_size, debug=True):
         if action == 1:
             if agent.cash_in_hand < data[t]:
                 raise ValueError
+            google_buy.append((data_date[t], data[t]))
             agent.cash_in_hand -= data[t]
             agent.total_share += 1
             agent.inventory.append(data[t])
@@ -135,6 +140,7 @@ def evaluate_model(agent, data, window_size, debug=True):
                 bought_price = agent.inventory.pop(0)
             else:
                 bought_price = data[0]
+            google_sell.append((data_date[t], data[t]))
             delta = data[t] - bought_price
             agent.cash_in_hand = agent.cash_in_hand + bought_price + delta
             agent.total_share -= 1
@@ -148,6 +154,4 @@ def evaluate_model(agent, data, window_size, debug=True):
             history.append((data[t], "HOLD"))
 
         state = next_state
-        print("cash_in_hand: {}, total_profit: {}, total_share: {}".format(
-            agent.cash_in_hand, total_profit, agent.total_share))
-    return total_profit, agent.cash_in_hand, agent.total_share
+    return total_profit, agent.cash_in_hand, agent.total_share , google_buy, google_sell
