@@ -6,6 +6,12 @@ Code References:
 Actor critic Pytorch : https://github.com/pytorch/examples/blob/master/reinforcement_learning/actor_critic.py
 
 
+#### Steps to run DQN 
+
+    - python3 train.py data/GOOG.csv --episode-count 1000 --debug --window-size 5
+    - python3 eval.py data/GOOG_2019.csv --window-size 5 --model-name model_dqn_1000 --debug
+
+
 #### Actor-Critic Test Results
 ![](https://github.com/mohdihabibi/Trading-Bot/blob/master/Actor-Critic/Test_results-AC.png)
 
