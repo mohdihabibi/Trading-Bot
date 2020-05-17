@@ -4,3 +4,12 @@ Our goal for this project is to implement a stock trading bot which is capable o
 
 Code References:
 Actor critic Pytorch : https://github.com/pytorch/examples/blob/master/reinforcement_learning/actor_critic.py
+
+
+#### Actor-Critic Test Results
+![](https://github.com/mohdihabibi/Trading-Bot/blob/master/Actor-Critic/Test_results-AC.png)
+
+#### DQN Test Results
+![](https://github.com/mohdihabibi/Trading-Bot/blob/master/DQN/plots/DQN_Test_Sell_vs_Buy.png)
+
+#### DDQN Test Results
