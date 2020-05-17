@@ -5,6 +5,12 @@ Our goal for this project is to implement a stock trading bot which is capable o
 Code References:
 Actor critic Pytorch : https://github.com/pytorch/examples/blob/master/reinforcement_learning/actor_critic.py
 
+#### Team Members
+
+- [Thasleem Tajudeen](https://github.com/Thaslim)
+- [Mohdi Habibi](https://github.com/mohdihabibi)
+- [Rakesh Amireddy](https://github.com/rakeshamireddy)
+
 
 #### Steps to run DQN 
 
